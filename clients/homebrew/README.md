@@ -15,12 +15,14 @@ Render the formula from downloaded release checksum files:
 
 ```bash
 clients/homebrew/render_formula.py \
-  --version 0.1.1 \
+  --version 0.1.2 \
   --repo d4lvl13n/gpbot-cli \
   --macos-arm64-sha-file ./gpbot-macos-arm64.pyz.sha256 \
-  --macos-x86-64-sha-file ./gpbot-macos-x86_64.pyz.sha256 \
   --output ./Formula/gpbot.rb
 ```
 
 Do not point the public formula at the private GPBot source repo. The formula
 must install only standalone release artifacts.
+
+The first Homebrew template targets Apple Silicon. Intel macOS users should use
+the direct installer or `pipx` path, which falls back to the pure Python wheel.

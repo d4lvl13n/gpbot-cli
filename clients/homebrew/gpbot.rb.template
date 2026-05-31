@@ -5,13 +5,10 @@ class Gpbot < Formula
   license "Proprietary"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/CODOLIE_ORG/GPBOT_CLI_RELEASE_REPO/releases/download/gpbot-cli-v#{version}/gpbot-macos-arm64.pyz"
-      sha256 "MACOS_ARM64_SHA256"
-    else
-      url "https://github.com/CODOLIE_ORG/GPBOT_CLI_RELEASE_REPO/releases/download/gpbot-cli-v#{version}/gpbot-macos-x86_64.pyz"
-      sha256 "MACOS_X86_64_SHA256"
-    end
+    odie "Use the install.sh or pipx path on Intel macOS." unless Hardware::CPU.arm?
+
+    url "https://github.com/CODOLIE_ORG/GPBOT_CLI_RELEASE_REPO/releases/download/gpbot-cli-v#{version}/gpbot-macos-arm64.pyz"
+    sha256 "MACOS_ARM64_SHA256"
   end
 
   depends_on "python@3.12"
@@ -31,4 +28,3 @@ class Gpbot < Formula
     assert_match "Authenticate with a GPBot API key", shell_output("#{bin}/gpbot login --help")
   end
 end
-

@@ -58,8 +58,6 @@ jobs:
         include:
           - runner: ubuntu-latest
             artifact: linux-x86_64
-          - runner: macos-13
-            artifact: macos-x86_64
           - runner: macos-14
             artifact: macos-arm64
 
