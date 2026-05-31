@@ -17,6 +17,7 @@ def main() -> int:
     parser.add_argument("--version", required=True, help="CLI version, for example 0.1.0")
     parser.add_argument("--repo", required=True, help="GitHub release repo, for example d4lvl13n/gpbot-cli")
     parser.add_argument("--macos-arm64-sha-file", type=Path, required=True)
+    parser.add_argument("--linux-x86-64-sha-file", type=Path, required=True)
     parser.add_argument("--template", type=Path, default=Path(__file__).with_name("gpbot.rb.template"))
     parser.add_argument("--output", type=Path, default=Path("gpbot.rb"))
     args = parser.parse_args()
@@ -30,6 +31,7 @@ def main() -> int:
     rendered = rendered.replace("CODOLIE_ORG", owner)
     rendered = rendered.replace("GPBOT_CLI_RELEASE_REPO", repo)
     rendered = rendered.replace("MACOS_ARM64_SHA256", _read_sha(args.macos_arm64_sha_file))
+    rendered = rendered.replace("LINUX_X86_64_SHA256", _read_sha(args.linux_x86_64_sha_file))
 
     args.output.write_text(rendered, encoding="utf-8")
     return 0

@@ -6,29 +6,34 @@ Customers do not need the GPBot source code, Docker, Postgres, Redis, Celery, or
 
 ## Install
 
-Published package install:
-
-```bash
-pipx install gpbot-cli
-```
-
-Homebrew distribution should wrap this package through the formula template in
-`clients/homebrew/gpbot.rb.template`.
-
-Release artifacts also include platform-specific `gpbot-*.pyz` zipapps for
-Homebrew/GitHub Release installs.
-
-Direct installer fallback after release artifacts are public:
+Direct GitHub Release installer:
 
 ```bash
 curl -fsSL https://github.com/d4lvl13n/gpbot-cli/releases/latest/download/install.sh | bash
 ```
 
-npm installer fallback after release artifacts are public:
+PyPI package install after publishing is enabled:
+
+```bash
+pipx install gpbot-cli
+```
+
+Homebrew distribution wraps the release zipapp through the formula template in
+`clients/homebrew/gpbot.rb.template`:
+
+```bash
+brew install d4lvl13n/tap/gpbot
+```
+
+npm installer after npm publishing is enabled:
 
 ```bash
 npm install -g gpbot-cli
 ```
+
+Release artifacts also include platform-specific `gpbot-*.pyz` zipapps and a
+pure Python wheel fallback. None of these artifacts include the GPBot server
+source tree.
 
 Development install from this checkout:
 

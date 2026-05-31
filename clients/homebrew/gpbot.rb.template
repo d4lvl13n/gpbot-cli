@@ -2,13 +2,20 @@ class Gpbot < Formula
   desc "HTTPS-backed GPBot operator CLI"
   homepage "https://finalboss-engine.com"
   version "VERSION"
-  license "Proprietary"
+  license :cannot_represent
 
   on_macos do
     odie "Use the install.sh or pipx path on Intel macOS." unless Hardware::CPU.arm?
 
     url "https://github.com/CODOLIE_ORG/GPBOT_CLI_RELEASE_REPO/releases/download/gpbot-cli-v#{version}/gpbot-macos-arm64.pyz"
     sha256 "MACOS_ARM64_SHA256"
+  end
+
+  on_linux do
+    odie "Use the install.sh or pipx path on non-x86_64 Linux." unless Hardware::CPU.intel?
+
+    url "https://github.com/CODOLIE_ORG/GPBOT_CLI_RELEASE_REPO/releases/download/gpbot-cli-v#{version}/gpbot-linux-x86_64.pyz"
+    sha256 "LINUX_X86_64_SHA256"
   end
 
   depends_on "python@3.12"

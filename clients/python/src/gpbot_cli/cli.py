@@ -14,11 +14,18 @@ from typing import Any, Callable, Iterable, Sequence
 
 import requests
 
+try:
+    from gpbot_cli import __version__
+except Exception:  # pragma: no cover - defensive for unusual launchers
+    __version__ = "unknown"
 
 DEFAULT_CONFIG_PATH = Path.home() / ".config" / "gpbot" / "operator-cli.json"
 DEFAULT_BASE_URL = "https://app.codolie.com"
-USER_AGENT = "gpbot-operator-cli/1.0"
-MCP_PROXY_USER_AGENT = "gpbot-operator-mcp-proxy/1.0"
+USER_AGENT = f"gpbot-cli/{__version__}"
+MCP_PROXY_USER_AGENT = f"gpbot-cli-mcp-proxy/{__version__}"
+
+GLOBAL_FLAG_OPTIONS = {"--json", "--insecure"}
+GLOBAL_VALUE_OPTIONS = {"--config", "--profile", "--timeout"}
 
 POOL_ENDPOINTS = {
     "schema": "/api/operator/pool/schema",
@@ -69,6 +76,18 @@ class OperatorProfile:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+    def to_display_dict(self) -> dict[str, Any]:
+        payload = self.to_dict()
+        if payload.get("api_key"):
+            payload["api_key"] = _mask_secret(str(payload["api_key"]))
+        return payload
+
+
+def _mask_secret(secret: str) -> str:
+    if len(secret) <= 8:
+        return "****"
+    return f"{secret[:6]}...{secret[-4:]}"
 
 
 class ProfileStore:
@@ -133,7 +152,7 @@ class ProfileStore:
         profiles = payload.setdefault("profiles", {})
         target = name or payload.get("active_profile")
         if not target:
-            raise CliError("No active profile configured. Use 'profile set ... --activate' first.")
+            raise CliError("No active profile configured. Run `gpbot login` first.")
         raw = profiles.get(target)
         if not isinstance(raw, dict):
             raise CliError(f"Profile '{target}' not found")
@@ -1266,7 +1285,7 @@ def profile_set_command(args: argparse.Namespace) -> None:
         vertical=args.vertical,
     )
     store.set_profile(profile, activate=args.activate)
-    result = {"success": True, "profile": profile.to_dict(), "active": store.load().get("active_profile")}
+    result = {"success": True, "profile": profile.to_display_dict(), "active": store.load().get("active_profile")}
     _output(result, json_mode=args.json)
 
 
@@ -1275,7 +1294,7 @@ def profile_list_command(args: argparse.Namespace) -> None:
     active, profiles = store.list_profiles()
     rows = []
     for profile in profiles:
-        row = profile.to_dict()
+        row = profile.to_display_dict()
         row["active"] = profile.name == active
         rows.append(row)
     _output({"activeProfile": active, "profiles": rows}, json_mode=args.json, columns=["active", "name", "tenant_id", "tenant_slug", "vertical", "base_url"], row_key="profiles")
@@ -1290,7 +1309,7 @@ def profile_use_command(args: argparse.Namespace) -> None:
 def profile_show_command(args: argparse.Namespace) -> None:
     store = ProfileStore(_config_path(args.config))
     profile = store.get_profile(args.name)
-    payload = profile.to_dict()
+    payload = profile.to_display_dict()
     payload["active"] = store.load().get("active_profile") == profile.name
     _output(payload, json_mode=args.json)
 
@@ -2150,8 +2169,34 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _normalize_global_args(argv: Sequence[str]) -> list[str]:
+    prefix: list[str] = []
+    rest: list[str] = []
+    index = 0
+    raw = list(argv)
+    while index < len(raw):
+        arg = raw[index]
+        if arg in GLOBAL_FLAG_OPTIONS:
+            prefix.append(arg)
+            index += 1
+            continue
+        if any(arg.startswith(f"{option}=") for option in GLOBAL_VALUE_OPTIONS):
+            prefix.append(arg)
+            index += 1
+            continue
+        if arg in GLOBAL_VALUE_OPTIONS and index + 1 < len(raw):
+            prefix.extend([arg, raw[index + 1]])
+            index += 2
+            continue
+        rest.append(arg)
+        index += 1
+    return prefix + rest
+
+
 def run_cli(argv: Sequence[str] | None = None, *, parser: argparse.ArgumentParser | None = None) -> int:
     parser = parser or build_parser()
+    if argv is not None:
+        argv = _normalize_global_args(argv)
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -2169,6 +2214,10 @@ def run_cli(argv: Sequence[str] | None = None, *, parser: argparse.ArgumentParse
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if len(argv) == 0:
+        argv = ["cli"] if sys.stdin.isatty() else ["--help"]
     return run_cli(argv, parser=build_parser())
 
 

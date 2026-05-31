@@ -12,6 +12,7 @@ Environment:
   GPBOT_CLI_REPO       GitHub repo that hosts releases (default: d4lvl13n/gpbot-cli)
   GPBOT_CLI_VERSION    Version without prefix, for example 0.1.0 (default: latest)
   GPBOT_CLI_INSTALL_DIR Install directory (default: ~/.local/bin)
+  GPBOT_CLI_STATE_DIR   State directory for wheel fallback venv (default: ~/.local/share/gpbot-cli)
 EOF
 }
 
@@ -36,11 +37,6 @@ case "$(uname -m)" in
   x86_64|amd64) arch="x86_64" ;;
   *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
 esac
-
-if [[ "${os}" == "linux" && "${arch}" != "x86_64" ]]; then
-  echo "No Linux ${arch} artifact is currently published." >&2
-  exit 1
-fi
 
 if ! command -v curl >/dev/null 2>&1; then
   echo "curl is required." >&2
