@@ -15,7 +15,7 @@ Render the formula from downloaded release checksum files:
 
 ```bash
 clients/homebrew/render_formula.py \
-  --version 0.1.3 \
+  --version 0.1.4 \
   --repo d4lvl13n/gpbot-cli \
   --macos-arm64-sha-file ./gpbot-macos-arm64.pyz.sha256 \
   --linux-x86-64-sha-file ./gpbot-linux-x86_64.pyz.sha256 \

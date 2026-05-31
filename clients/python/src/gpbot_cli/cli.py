@@ -1736,6 +1736,7 @@ def _add_subcommand_json_arg(parser: argparse.ArgumentParser) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gpbot", description="GPBot remote operator CLI")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     _add_common_connection_args(parser)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
