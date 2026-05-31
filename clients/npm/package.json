@@ -1,0 +1,24 @@
+{
+  "name": "gpbot-cli",
+  "version": "0.1.0",
+  "description": "Installer wrapper for the HTTPS-backed GPBot CLI",
+  "license": "UNLICENSED",
+  "bin": {
+    "gpbot": "bin/gpbot.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js"
+  },
+  "files": [
+    "bin",
+    "scripts",
+    "vendor",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
