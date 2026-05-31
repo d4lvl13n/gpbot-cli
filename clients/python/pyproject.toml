@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gpbot-cli"
-version = "0.1.2"
+version = "0.1.3"
 description = "Installable HTTPS-backed GPBot operator CLI"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,4 +22,3 @@ gpbot = "gpbot_cli.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gpbot_cli"]
-
